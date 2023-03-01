@@ -1,0 +1,12 @@
+true = lam-t1: (lam-t2: t1)
+false = lam-f1: (lam-f2: f2)
+xor = lam-b1: (lam-b2: b1, (b2, false, b1), b2)
+
+a = lam-va: xor, true, false, va
+display_a = clc: xor, true, false
+
+b = lam-vb: xor, false, true, vb
+display_b = clc: xor, false, true
+
+a_xor_b = clc: xor, a, b
+

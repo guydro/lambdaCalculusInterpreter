@@ -1,0 +1,110 @@
+This is an interpreter for lambda calculus.
+For those who are not familiar with it, lambda calculus is a turing-complete machine that consists of only functions.
+It is implemented in a lot of high level programming languages, like python or javascript with the lambda keword.
+
+I created this interpreter, using assembly x86 (nasm syntax) and C, to be able to do two things:
+1. Create a new function.
+2. Evaluate ean expression.
+
+The syntax of the interpreter is as follows:
+1. Choose a variable name, eg. Var.
+2. Place an equals sign.
+3. If you want to calculate an expression, write "clc:", otherwise, write "lam-" and then the paraameter's name.
+4. Then you are free to write whatever you want in the following notation: after every object (function, variable,
+   many parenthesis) there must be a comma.
+   There are a few important caveats you have to follow while writing expressions, if you don't follow them you might
+   get inconsistent or wrong results:
+   i.   Make sure that if you create a new function inside of an expression you wrap it with parenthesis. (example 2)
+   ii.  Don't reuse a parameter's name twice with two different variables. (example 3)
+   iii. If you want to reuse results you calculated, wrap them in a "lam-var: (your result), var" statement. (example 8)
+   iv.  The interpreter doesn't read ascii symbols that are not letters, new-lines ('\n') and carriage returns ('\r'),
+        and please don't use non ascii characters.
+
+Write your code in a text file named "Lambda_Code.txt", and run it on windows
+
+Examples:
+
+1. Calculating church numerals:
+    zero = lam-fu: (lam-0: 0)
+    succ = lam-n: lam-f: (lam-x: f, (n, f, x))
+    one = clc: succ, zero
+    two = clc: succ, one
+
+2. Calculating church numerals using a wrong syntax:
+    zero = lam-fu: lam-0: 0 <------------------ no paranthesis around "lam-0: 0"
+    succ = lam-n: lam-f: (lam-x: f, (n, f, x))
+    one = clc: succ, zero
+    two = clc: succ, one
+
+3. Calculating church numerals using a different wrong syntax:
+    zero = lam-f: (lam-0: 0) <-------------------- f is used on two different lines as a parameter's name.
+    succ = lam-n: lam-f: (lam-x: f, (n, f, x)) <--
+    one = clc: succ, zero
+    two = clc: succ, one
+
+4. Working with booleans:
+   true = lam-x: (lam-y: x)
+   false = lam-a: (lam-b: b)
+
+   and = lam-p: (lam-q: p, q , p  ) <----- notice that the interpreter doesn't care about spaces.
+
+   true_and_false = clc: and, true, false
+
+5. Using parenthesis right:
+   true = lam-x: (lam-y: x)
+   false = lam-a: (lam-b: b)
+   and = lam-p: (lam-q: p, q , p  )
+   true_and_false = clc: (and, false), (and, true, false) <-- you may use parenthesis like that.
+
+6. Using parenthesis wrong:
+   true = lam-x: (lam-y: x)         There is a missing comma here.
+   false = lam-a: (lam-b: b)         |
+   and = lam-p: (lam-q: p, q , p  )  V
+   true_and_false = clc: (and, false) (and, true, false)
+
+7. Functions that don't exist:
+   The interpreter is lazily evaluating expressions, that means that he will not check if functions exist
+   unless it is completely necessary.
+
+   For example, the following code will work just fine:
+
+   identity = lam-0: 0
+   spelling_identity_wrong = clc: identity, idendidy <- spelling "identity" wrong.
+
+   But this code will fail on line 2:
+
+   identity = lam-0: 0
+   spelling_identity_wrong = clc: idendidy, identity
+
+   Even though there is no variable named "idendidy" (with d instead of t), the interpreter won't care until he actually
+   has to substitute something into "idendidy".
+
+   Another consequence of this is that the interpreter will only fail on lines that evaluate expressions ("clc:" lines),
+   for example, the following code will throw an error on line 3, even though the mistake is on line 2:
+
+   identity = lam-0: 0
+   sub_into_identity = lam-a: idendidy, a <-------------- misspelled "identity" here.
+   no_mistakes_here = clc: sub_into_identity, identity <- code will fail here.
+
+8. Reusing calculations:
+   true = lam-t1: (lam-t2: t1)
+   false = lam-f1: (lam-f2: f2)
+   xor = lam-b1: (lam-b2: b1, (b2, false, b1), b2)
+
+   a = clc: xor, true, false
+   b = clc: xor, false, true
+
+   a_xor_b = clc: xor, a, b <--------------- a and b are results of a calculation, and may not be used again.
+
+9. The correct way of doing 8:
+   true = lam-t1: (lam-t2: t1)
+   false = lam-f1: (lam-f2: f2)
+   xor = lam-b1: (lam-b2: b1, (b2, false, b1), b2)
+
+   a = lam-va: xor, true, false, va
+   display_a = clc: xor, true, false
+
+   b = lam-vb: xor, false, true, vb
+   display_b = clc: xor, false, true
+
+   a_xor_b = clc: xor, a, b
