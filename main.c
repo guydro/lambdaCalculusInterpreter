@@ -34,6 +34,8 @@ int main() {
         if (ch <= 32 && ch != '\r' && ch != '\n') continue ; //don't copy non-displayable characters or spaces
         text[++t] = ch;
     } while (ch != EOF);
+    
+    fclose(raw_code);
 
     text[t] = '\r';
     text[++t] = '\0';
