@@ -38,7 +38,7 @@ int main() {
     fclose(raw_code);
 
 
-    text[t] = '\r';
+    text[++t] = '\r';
     text[++t] = '\0';
 
 
