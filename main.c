@@ -18,7 +18,7 @@ int main() {
 
     do {
         ch = fgetc(raw_code);
-    } while (ch <= 32);
+    } while (ch <= 32 && ch != EOF);
 
     int t=0;
     text[t] = ch;
@@ -34,8 +34,9 @@ int main() {
         if (ch <= 32 && ch != '\r' && ch != '\n') continue ; //don't copy non-displayable characters or spaces
         text[++t] = ch;
     } while (ch != EOF);
-    
+
     fclose(raw_code);
+
 
     text[t] = '\r';
     text[++t] = '\0';
